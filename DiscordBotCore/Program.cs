@@ -14,12 +14,16 @@ namespace DiscordBotCore
             Console.WriteLine("Hello World!");
 
             var storage = Unity.Resolve<IDataStorage>();
-
             var connection = Unity.Resolve<Connection>();
+            var playerStats = Unity.Resolve<ApiWebRequest>();
+
+            await playerStats.GetPlayerIdAsync("PuljEz");
+
             await connection.ConnectAsync(new BotConfig
             {
                 Token = storage.RestoreObject<string>("Config/BotToken"),
-            } );
+            });
+
         }
     }
 }

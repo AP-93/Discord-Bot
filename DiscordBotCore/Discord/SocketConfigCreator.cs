@@ -9,7 +9,7 @@ namespace DiscordBotCore.Discord
         {
             return new DiscordSocketConfig {
 
-                LogLevel = LogSeverity.Error,
+                LogLevel = LogSeverity.Debug,
 
 
             };
@@ -17,8 +17,7 @@ namespace DiscordBotCore.Discord
 
         public static DiscordSocketConfig GetNew()
         {
-            return new DiscordSocketConfig();
-         
+            return new DiscordSocketConfig();        
         }
     }
 }
