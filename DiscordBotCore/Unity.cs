@@ -5,6 +5,7 @@ using DiscordBotCore.Storage;
 using DiscordBotCore.Storage.Implementations;
 using Unity;
 using Unity.Injection;
+using DiscordBotCore.Discord.Commands;
 
 namespace DiscordBotCore
 {
@@ -27,6 +28,7 @@ namespace DiscordBotCore
             _container = new UnityContainer();
             _container.RegisterSingleton<IDataStorage, JsonStorage>();
             _container.RegisterSingleton<IConnection, Connection>();
+            _container.RegisterSingleton<ICommandHandler, CommandHandler>();
             _container.RegisterSingleton<ILogger,Logger>();
             _container.RegisterSingleton<ApiWebRequest>();
            // _container.RegisterType<DiscordSocketConfig>(new InjectionFactory(i => SocketConfigCreator.GetDefault()));

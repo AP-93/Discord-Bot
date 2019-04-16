@@ -1,4 +1,5 @@
 ﻿using DiscordBotCore.Discord;
+using DiscordBotCore.Discord.Commands;
 using DiscordBotCore.Discord.Entities;
 using DiscordBotCore.Storage;
 using System.Threading.Tasks;
@@ -8,12 +9,12 @@ namespace DiscordBotCore
      class DiscordBot
     {
         private readonly IConnection _connection;
-        //private readonly ICommandHandler commandHandler;
+        private readonly ICommandHandler _commandHandler;
 
-        public DiscordBot(IConnection connection)
+        public DiscordBot(IConnection connection, ICommandHandler commandHandler )
         {
             _connection = connection;
-           // this.commandHandler = commandHandler;
+            _commandHandler = commandHandler;
         }
 
         public async Task Run()
@@ -22,7 +23,7 @@ namespace DiscordBotCore
             {
                 Token = Unity.Resolve<IDataStorage>().RestoreObject<string>("Config/BotToken"),
             });
-            //await commandHandler.InitializeAsync();
+            await _commandHandler.InstallCommandsAsync();
             await Task.Delay(-1);
         }
     }
