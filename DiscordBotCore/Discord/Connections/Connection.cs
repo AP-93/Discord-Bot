@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DiscordBotCore.Discord
 {
-    class Connection
+    class Connection : IConnection
     {
         private readonly DiscordSocketClient _client;
         private readonly DiscordLogger _logger;
@@ -16,15 +16,12 @@ namespace DiscordBotCore.Discord
             _client = client;
         }
 
-        internal async Task ConnectAsync(BotConfig config)
+        public async Task ConnectAsync(BotConfig config)
         {
-
             _client.Log += _logger.Log;
-
 
             await _client.LoginAsync(TokenType.Bot, config.Token);
             await _client.StartAsync();
-            await Task.Delay(-1);
         }
     }
 }

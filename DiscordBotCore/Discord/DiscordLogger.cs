@@ -1,4 +1,5 @@
 ﻿using Discord;
+using DiscordBotCore.Log;
 using System.Threading.Tasks;
 
 namespace DiscordBotCore.Discord
