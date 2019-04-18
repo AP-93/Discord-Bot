@@ -23,6 +23,7 @@ namespace DiscordBotCore
             {
                 Token = Unity.Resolve<IDataStorage>().RestoreObject<string>("Config/BotToken"),
             });
+
             await _commandHandler.InstallCommandsAsync();
             await Task.Delay(-1);
         }

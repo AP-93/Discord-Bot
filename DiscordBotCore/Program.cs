@@ -1,4 +1,4 @@
-﻿using System;
+﻿using DiscordBotCore.Fortnite;
 using System.Threading.Tasks;
 
 namespace DiscordBotCore
@@ -8,13 +8,8 @@ namespace DiscordBotCore
         private static async Task Main()
         {
             Unity.RegisterTypes();
-            Console.WriteLine("Hello World!");
-
+            //var a = Unity.Resolve<PlayersOnlineInfo>();
             await Unity.Resolve<DiscordBot>().Run();
-
-            //var playerStats = Unity.Resolve<ApiWebRequest>();
-           // await playerStats.GetPlayerIdAsync("PuljEz");
-
         }
     }
 }

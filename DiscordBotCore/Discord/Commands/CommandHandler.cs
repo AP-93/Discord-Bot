@@ -1,10 +1,11 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBotCore.Fortnite;
 using DiscordBotCore.Log;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
+using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DiscordBotCore.Discord.Commands
@@ -14,19 +15,29 @@ namespace DiscordBotCore.Discord.Commands
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly ILogger _logger;
+        private IServiceProvider _services;
 
         // Retrieve client and CommandService instance via ctor
         public CommandHandler(DiscordSocketClient client, CommandService commands, ILogger logger)
         {
             _commands = commands;
             _client = client;
-            _logger = logger;
+            _logger = logger;  
         }
 
         public async Task InstallCommandsAsync()
         {
             // Hook the MessageReceived event into our command handler
             _client.MessageReceived += HandleCommandAsync;
+
+            _services = new ServiceCollection()
+                .AddSingleton(_client)
+                .AddSingleton(_commands)
+                .AddSingleton<ILogger, Logger>()
+                .AddSingleton<HttpClient>()
+                .AddSingleton<IHttpClientProvider,HttpClientProvider>()
+                .AddSingleton<ApiWebRequest>()
+                .BuildServiceProvider();
 
             // Here we discover all of the command modules in the entry 
             // assembly and load them. Starting from Discord.NET 2.0, a
@@ -37,8 +48,10 @@ namespace DiscordBotCore.Discord.Commands
             // If you do not use Dependency Injection, pass null.
             // See Dependency Injection guide for more information.
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
-                                            services: null);
+                                            services: _services);
         }
+
+     
 
         private async Task HandleCommandAsync(SocketMessage messageParam)
         {
@@ -63,7 +76,7 @@ namespace DiscordBotCore.Discord.Commands
             await _commands.ExecuteAsync(
                 context: context,
                 argPos: argPos,
-                services: null);
+                services: _services);
         }
     }
 }

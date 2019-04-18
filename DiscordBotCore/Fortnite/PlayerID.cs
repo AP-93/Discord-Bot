@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace DiscordBotCore.Fortnite.PlayerStats
 {
-    class PlayerID
+    public class PlayerID
     {
         public string uid { get; set; }
         public string username { get; set; }

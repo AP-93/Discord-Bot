@@ -1,37 +1,43 @@
 ﻿using Newtonsoft.Json;
 using DiscordBotCore.Fortnite.PlayerStats;
-using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using DiscordBotCore.Fortnite;
 
 namespace DiscordBotCore
 {
-    class ApiWebRequest
+    public class ApiWebRequest
     {
-        static HttpClient _client;
+        static IHttpClientProvider _httpProvider;
 
-        public ApiWebRequest(HttpClient client)
+        public ApiWebRequest(IHttpClientProvider httpProvider)
         {
-            _client = client;
-            _client.BaseAddress = new Uri("https://fortnite-public-api.theapinetwork.com/prod09/users/id?username=");
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpProvider = httpProvider;
         }
 
-        public async Task<PlayerID> GetPlayerIdAsync(string path)
+        public static async Task<string> GetPlayerIdAsync(string path)
         {
             PlayerID playerId = null;
-            HttpResponseMessage response = await _client.GetAsync(_client.BaseAddress+path);
+            var response = await _httpProvider.GetAsync("https://fortnite-public-api.theapinetwork.com/prod09/users/id?username="+path);
             if (response.IsSuccessStatusCode)
             {
                 playerId = JsonConvert.DeserializeObject<PlayerID>(
                  await response.Content.ReadAsStringAsync());
-                Console.WriteLine(playerId.uid);
             }
-         
-            return playerId;
+            return playerId.uid;
+        }
+
+        public static async Task<string> GetPlayerStats (string arg)
+        {
+            //string id = await GetPlayerIdAsync(arg);
+            PlayerData data = null;
+            var response = await _httpProvider.GetAsync("https://fortnite-public-api.theapinetwork.com/prod09/users/public/br_stats_v2?user_id=" + arg);
+            if (response.IsSuccessStatusCode)
+            {
+                data = JsonConvert.DeserializeObject<PlayerData>(
+                 await response.Content.ReadAsStringAsync());   
+            }
+            return ("Name: "+data.EpicName+"\n"+
+                    "Wins in default solo, duo and squad modes: "+data.OverallData.DefaultModes.Placetop1);
         }
     }
 }
