@@ -17,7 +17,7 @@ namespace DiscordBotCore.Fortnite
 
             loopingTimer = new Timer()
             {
-                Interval = 10000,
+                Interval = 600000,
                 AutoReset = true,
                 Enabled = true
             };

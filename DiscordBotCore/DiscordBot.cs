@@ -22,7 +22,7 @@ namespace DiscordBotCore
         {
             await _connection.ConnectAsync(new BotConfig
             {
-                Token = Unity.Resolve<IDataStorage>().RestoreObject<string>("Config/BotToken"),
+                Token = "enter token",
             });
 
             await _commandHandler.InstallCommandsAsync();

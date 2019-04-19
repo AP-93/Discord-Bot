@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <ApplicationIcon />
+    <Win32Resource />
+    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +14,16 @@
     <Compile Remove="Migrations\20190419130636_Migrations.cs" />
     <Compile Remove="Migrations\20190419130724_Migrations.cs" />
     <Compile Remove="Migrations\20190419131217_Migrations.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Storage\Database.sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Storage\Database.sqlite">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +36,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Unity" Version="5.10.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
