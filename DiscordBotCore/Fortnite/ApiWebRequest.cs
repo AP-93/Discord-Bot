@@ -2,6 +2,7 @@
 using DiscordBotCore.Fortnite.PlayerStats;
 using System.Threading.Tasks;
 using DiscordBotCore.Fortnite;
+using DiscordBotCore.Storage.Database;
 
 namespace DiscordBotCore
 {
@@ -38,6 +39,22 @@ namespace DiscordBotCore
             }
             return ("Name: "+data.EpicName+"\n"+
                     "Wins in default solo, duo and squad modes: "+data.OverallData.DefaultModes.Placetop1);
+        }
+
+        public static async Task<Players> GetPlayerMatches(string arg)
+        {
+            //string id = await GetPlayerIdAsync(arg);
+            PlayerData data = new PlayerData();
+            Players players = new Players() ;
+            var response = await _httpProvider.GetAsync("https://fortnite-public-api.theapinetwork.com/prod09/users/public/br_stats_v2?user_id=" + arg);
+            if (response.IsSuccessStatusCode)
+            {
+                data = JsonConvert.DeserializeObject<PlayerData>(
+                 await response.Content.ReadAsStringAsync());
+            }
+            players.matchesPlayed =(int) (data.OverallData.DefaultModes.Matchesplayed + data.OverallData.LargeTeamModes.Matchesplayed + data.OverallData.LtmModes.Matchesplayed);
+            players.FortniteName = data.EpicName;
+            return players;
         }
     }
 }

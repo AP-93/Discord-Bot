@@ -1,4 +1,6 @@
 ﻿using Discord.WebSocket;
+using DiscordBotCore.Storage.Database;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -26,7 +28,28 @@ namespace DiscordBotCore.Fortnite
 
         private static async void OnTimerTicked(object sender, ElapsedEventArgs e)
         {
-            await channel.SendMessageAsync(await ApiWebRequest.GetPlayerStats("8ed3293f263b44f1963fb3b4388d1b98"));
+            await CheckDataChanges();
+        }
+
+        private static async Task CheckDataChanges()
+        {
+            List<Players> plyrList = new List<Players>();
+            plyrList = Storage.Database.Data.GetData();
+            int counter = 0;
+            
+          foreach(Players plyr  in plyrList)
+            { 
+                var apiData= await ApiWebRequest.GetPlayerMatches(plyr.FortniteID);
+                if (plyr.matchesPlayed != apiData.matchesPlayed)
+                { 
+                    await channel.SendMessageAsync(apiData.FortniteName+ " GINE!!!");
+                    await Storage.Database.Data.SaveChanges(plyr.ID, apiData.matchesPlayed, apiData.FortniteName);
+                    counter++;
+                }
+                
+            }
+          if(counter == 0)
+            await channel.SendMessageAsync("NIKO NEGINE FORTNAJT PROPADA!!!");
         }
     }
 }

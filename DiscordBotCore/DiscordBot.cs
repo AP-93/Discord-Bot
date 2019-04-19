@@ -2,6 +2,7 @@
 using DiscordBotCore.Discord.Commands;
 using DiscordBotCore.Discord.Entities;
 using DiscordBotCore.Storage;
+using System;
 using System.Threading.Tasks;
 
 namespace DiscordBotCore
