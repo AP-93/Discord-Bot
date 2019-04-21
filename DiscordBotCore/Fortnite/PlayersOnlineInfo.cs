@@ -10,14 +10,13 @@ namespace DiscordBotCore.Fortnite
     {
         private static Timer loopingTimer;
         private static SocketTextChannel channel;
-      
         internal static Task StartTimer()
         {
             channel = Global.Client.GetGuild(565554856132345856).GetTextChannel(565554856132345858);
 
             loopingTimer = new Timer()
             {
-                Interval = 600000,
+                Interval = 60000,
                 AutoReset = true,
                 Enabled = true
             };

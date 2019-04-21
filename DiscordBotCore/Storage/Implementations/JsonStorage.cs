@@ -6,10 +6,12 @@ namespace DiscordBotCore.Storage.Implementations
 {
     class JsonStorage : IDataStorage
     {
-        public T RestoreObject<T>(string key)
+        public string RestoreToken (string jsonFile)
         {
-            var json = File.ReadAllText($"{key}.json");
-            return JsonConvert.DeserializeObject<T>(json);
+
+            var json = File.ReadAllText(GetCurrentDirectory()+jsonFile);
+            dynamic array = JsonConvert.DeserializeObject(json);
+            return array.token;
         }
 
         public void StoreObject(object obj, string key)

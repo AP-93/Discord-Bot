@@ -2,7 +2,6 @@
 using DiscordBotCore.Discord.Commands;
 using DiscordBotCore.Discord.Entities;
 using DiscordBotCore.Storage;
-using System;
 using System.Threading.Tasks;
 
 namespace DiscordBotCore
@@ -11,18 +10,20 @@ namespace DiscordBotCore
     {
         private readonly IConnection _connection;
         private readonly ICommandHandler _commandHandler;
+        private readonly IDataStorage _dataStorage;
 
-        public DiscordBot(IConnection connection, ICommandHandler commandHandler )
+        public DiscordBot(IConnection connection, ICommandHandler commandHandler, IDataStorage dataStorage)
         {
             _connection = connection;
             _commandHandler = commandHandler;
+            _dataStorage = dataStorage;
         }
 
         public async Task Run()
         {
             await _connection.ConnectAsync(new BotConfig
             {
-                Token = "enter token",
+                Token = _dataStorage.RestoreToken(@"\Config.json"),
             });
 
             await _commandHandler.InstallCommandsAsync();
