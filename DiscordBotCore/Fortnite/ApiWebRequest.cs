@@ -41,7 +41,7 @@ namespace DiscordBotCore
                     "Wins in default solo, duo and squad modes: "+data.OverallData.DefaultModes.Placetop1);
         }
 
-        public static async Task<Players> GetPlayerMatches(string arg)
+        public static async Task<Players> GetPlayerMatchesAsync(string arg)
         {
             //string id = await GetPlayerIdAsync(arg);
             PlayerData data = new PlayerData();
@@ -50,11 +50,14 @@ namespace DiscordBotCore
             if (response.IsSuccessStatusCode)
             {
                 data = JsonConvert.DeserializeObject<PlayerData>(
-                 await response.Content.ReadAsStringAsync());
+                  await response.Content.ReadAsStringAsync());
+
+                players.matchesPlayed =(int) (data.OverallData.DefaultModes.Matchesplayed + data.OverallData.LargeTeamModes.Matchesplayed + data.OverallData.LtmModes.Matchesplayed);
+
+                players.FortniteName = data.EpicName; 
+
             }
-            players.matchesPlayed =(int) (data.OverallData.DefaultModes.Matchesplayed + data.OverallData.LargeTeamModes.Matchesplayed + data.OverallData.LtmModes.Matchesplayed);
-            players.FortniteName = data.EpicName;
-            return players;
+          return players;
         }
     }
 }

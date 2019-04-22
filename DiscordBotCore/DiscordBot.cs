@@ -23,7 +23,7 @@ namespace DiscordBotCore
         {
             await _connection.ConnectAsync(new BotConfig
             {
-                Token = _dataStorage.RestoreToken(@"\Config.json"),
+                Token = _dataStorage.RestoreToken("token"),
             });
 
             await _commandHandler.InstallCommandsAsync();
