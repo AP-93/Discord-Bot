@@ -8,26 +8,24 @@ namespace DiscordBotCore.Discord.Commands
     public class InfoModule : ModuleBase<SocketCommandContext>
     {
         private readonly ILogger _log;
-        private readonly ApiWebRequest _webRequest;
+        private readonly IApiWebRequest _webRequest;
         
-       
-        public InfoModule(ILogger log, ApiWebRequest webRequest)
+        public InfoModule(ILogger log, IApiWebRequest webRequest)
         {
             _webRequest = webRequest;
             _log = log;
         }
        
         [Command("Solo")]
-        public async Task Solo([Remainder] string echo)
+        public async Task Solo([Remainder] string name)
         {
-            await ReplyAsync(await ApiWebRequest.GetSoloStats(echo));
+            await ReplyAsync(await _webRequest.GetSoloStats(name));
         }
 
         [Command("Duo")]
-        public async Task DuoStats([Remainder] string echo)
+        public async Task DuoStats([Remainder] string name)
         {
-           
-            await ReplyAsync(await ApiWebRequest.GetDuoStats(echo));
+            await ReplyAsync(await _webRequest.GetDuoStats(name));
         }
     }
 }

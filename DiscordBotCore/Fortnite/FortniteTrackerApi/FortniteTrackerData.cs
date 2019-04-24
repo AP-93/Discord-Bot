@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace DiscordBotCore.Fortnite
+namespace DiscordBotCore.Fortnite.FortniteTrackerApi
 {
     public class TrnRating
     {
@@ -216,8 +215,8 @@ namespace DiscordBotCore.Fortnite
         public ScorePerMatch scorePerMatch { get; set; }
     }
 
-    public class P9
-{
+    public class P9
+    {
         public TrnRating trnRating { get; set; }
         public Score score { get; set; }
         public Top1 top1 { get; set; }
@@ -235,8 +234,8 @@ namespace DiscordBotCore.Fortnite
         public ScorePerMatch scorePerMatch { get; set; }
     }
 
-    public class CurrP2
-{
+    public class CurrP2
+    {
         public TrnRating trnRating { get; set; }
         public Score score { get; set; }
         public Top1 top1 { get; set; }
@@ -254,8 +253,8 @@ namespace DiscordBotCore.Fortnite
         public ScorePerMatch scorePerMatch { get; set; }
     }
 
-    public class CurrP10
-{
+    public class CurrP10
+    {
         public TrnRating trnRating { get; set; }
         public Score score { get; set; }
         public Top1 top1 { get; set; }
@@ -273,8 +272,8 @@ namespace DiscordBotCore.Fortnite
         public ScorePerMatch scorePerMatch { get; set; }
     }
 
-    public class CurrP9
-{
+    public class CurrP9
+    {
         public TrnRating trnRating { get; set; }
         public Score score { get; set; }
         public Top1 top1 { get; set; }
@@ -292,55 +291,53 @@ namespace DiscordBotCore.Fortnite
         public ScorePerMatch scorePerMatch { get; set; }
     }
 
-    public class Stats
-{
-    public P2 p2 { get; set; }
-    public P10 p10 { get; set; }
-    public P9 p9 { get; set; }
-    public CurrP2 curr_p2 { get; set; }
-    public CurrP10 curr_p10 { get; set; }
-    public CurrP9 curr_p9 { get; set; }
-}
+    public class Stats
+    {
+        public P2 p2 { get; set; }
+        public P10 p10 { get; set; }
+        public P9 p9 { get; set; }
+        public CurrP2 curr_p2 { get; set; }
+        public CurrP10 curr_p10 { get; set; }
+        public CurrP9 curr_p9 { get; set; }
+    }
 
-public class LifeTimeStat
-{
-    public string key { get; set; }
-    public string value { get; set; }
-}
+    public class LifeTimeStat
+    {
+        public string key { get; set; }
+        public string value { get; set; }
+    }
 
-public class RecentMatch
-{
-    public int id { get; set; }
-    public string accountId { get; set; }
-    public string playlist { get; set; }
-    public int kills { get; set; }
-    public int minutesPlayed { get; set; }
-    public int top1 { get; set; }
-    public int top5 { get; set; }
-    public int top6 { get; set; }
-    public int top10 { get; set; }
-    public int top12 { get; set; }
-    public int top25 { get; set; }
-    public int matches { get; set; }
-    public int top3 { get; set; }
-    public DateTime dateCollected { get; set; }
-    public int score { get; set; }
-    public int platform { get; set; }
-    public double trnRating { get; set; }
-    public double trnRatingChange { get; set; }
-}
+    public class RecentMatch
+    {
+        public int id { get; set; }
+        public string accountId { get; set; }
+        public string playlist { get; set; }
+        public int kills { get; set; }
+        public int minutesPlayed { get; set; }
+        public int top1 { get; set; }
+        public int top5 { get; set; }
+        public int top6 { get; set; }
+        public int top10 { get; set; }
+        public int top12 { get; set; }
+        public int top25 { get; set; }
+        public int matches { get; set; }
+        public int top3 { get; set; }
+        public DateTime dateCollected { get; set; }
+        public int score { get; set; }
+        public int platform { get; set; }
+        public double trnRating { get; set; }
+        public double trnRatingChange { get; set; }
+    }
 
-public class FortniteTrackerData
-{
-    public string accountId { get; set; }
-    public int platformId { get; set; }
-    public string platformName { get; set; }
-    public string platformNameLong { get; set; }
-    public string epicUserHandle { get; set; }
-    public Stats stats { get; set; }
-    public IList<LifeTimeStat> lifeTimeStats { get; set; }
-    public IList<RecentMatch> recentMatches { get; set; }
-}
-
-
+    public class FortniteTrackerData
+    {
+        public string accountId { get; set; }
+        public int platformId { get; set; }
+        public string platformName { get; set; }
+        public string platformNameLong { get; set; }
+        public string epicUserHandle { get; set; }
+        public Stats stats { get; set; }
+        public IList<LifeTimeStat> lifeTimeStats { get; set; }
+        public IList<RecentMatch> recentMatches { get; set; }
+    }
 }

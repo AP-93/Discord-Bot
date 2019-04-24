@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace DiscordBotCore.Discord
+namespace DiscordBotCore.Discord.Connections
 {
     class SocketConfigCreator
     {

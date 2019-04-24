@@ -1,84 +1,81 @@
 ﻿using Discord.WebSocket;
 using DiscordBotCore.Storage.Database;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Timers;
 
 namespace DiscordBotCore.Fortnite
 {
-    internal static class PlayersOnlineInfo
+    internal class PlayersOnlineInfo : IPlayersOnlineInfo
     {
         private static Timer loopingTimer;
         private static SocketTextChannel channel;
-        internal static Task StartTimer()
+        private static DiscordSocketClient _client;
+        private static IApiWebRequest _apiWebRequest;
+
+        public PlayersOnlineInfo(IApiWebRequest apiWebRequest, DiscordSocketClient client)
         {
-            channel = Global.Client.GetGuild(565554856132345856).GetTextChannel(565554856132345858);
+            _apiWebRequest = apiWebRequest;
+            _client = client;
+        }
+
+        public Task StartTimer()
+        {
+            channel = _client.GetGuild(565554856132345856).GetTextChannel(565554856132345858);
 
             loopingTimer = new Timer()
             {
-                Interval = 600000,
+                Interval = 60000,
                 AutoReset = true,
                 Enabled = true
             };
-            loopingTimer.Elapsed +=  OnTimerTickedAsync;
+            loopingTimer.Elapsed += OnTimerTickedAsync;
 
             return Task.CompletedTask;
         }
 
-        private static async void OnTimerTickedAsync(object sender, ElapsedEventArgs e)
+        public async void OnTimerTickedAsync(object sender, ElapsedEventArgs e)
         {
-            List<Players> plyrList = new List<Players>();
-            plyrList = Storage.Database.Data.GetData();
-            int cnter = 0;
-            foreach (Players plyr in plyrList)
+            if (CheckIfVoiceEmpty())
             {
+                List<Players> plyrList = new List<Players>();
+                plyrList = Storage.Database.Data.GetData();
 
-                //await CheckDataChangesFortniteTrackerAsync(plyr, cnter);
-                await CheckDataChangesAsync(plyr, cnter);
-                await Task.Delay(10000);
+                foreach (Players plyr in plyrList)
+                {
+                    await CheckDataChangesAsync(plyr);
+                    await Task.Delay(10000);
+                }
             }
-
-            /*if (cnter == 0)
-            {
-                await channel.SendMessageAsync("NIKO NEGINE FORTNAJT PROPADA!!!");
-            }*/
         }
 
-        private static async Task CheckDataChangesAsync(Players plyrs, int counter)
+        public async Task CheckDataChangesAsync(Players plyrs)
         {
-          
+            var apiData = await _apiWebRequest.GetPlayerMatchesAsync(plyrs.FortniteID);
 
-            var apiData = await ApiWebRequest.GetPlayerMatchesAsync(plyrs.FortniteID);
-
-            Console.WriteLine(plyrs.FortniteName+"UPISANO:: "+plyrs.matchesPlayed + "  IZVUCENO :    "+ apiData.matchesPlayed);
-            if (plyrs.matchesPlayed != apiData.matchesPlayed)
+            if (plyrs.matchesPlayed != apiData.matchesPlayed && apiData.matchesPlayed != 0)
             {
-
                 await channel.SendMessageAsync(apiData.FortniteName + " GINE!!! \n" +
                                             "Matches: " + (apiData.matchesPlayed - plyrs.matchesPlayed) + "\n" +
                                             "Wins: " + (apiData.wins - plyrs.wins) + "\n" +
                                             "Kills: " + (apiData.kills - plyrs.kills) + "\n");
-                await Storage.Database.Data.SaveChanges(plyrs.ID, apiData.matchesPlayed, apiData.FortniteName, apiData.kills,apiData.wins);
+                await Storage.Database.Data.SaveChanges(plyrs.ID, apiData.matchesPlayed, apiData.FortniteName, apiData.kills, apiData.wins);
             }
-
-
         }
-        private static async Task CheckDataChangesFortniteTrackerAsync(Players plyrs, int counter)
+
+        public bool CheckIfVoiceEmpty()
         {
+            var chnls = _client.GetGuild(565554856132345856).VoiceChannels;
+            int counter = 0;
 
-            var apiData = await ApiWebRequest.GetPlayerMatchesFortniteTrackerAsync(await ApiWebRequest.GetPlayerName(plyrs.FortniteID));
-
-            if (plyrs.matchesPlayed != apiData.matchesPlayed)
+            foreach (var chnl in chnls)
             {
-
-                await Storage.Database.Data.SaveChanges(plyrs.ID, apiData.matchesPlayed, apiData.FortniteName ,apiData.kills, apiData.wins);
-                await channel.SendMessageAsync(apiData.FortniteName + " GINE!!! \n" + 
-                                                "broj meceva:  "+apiData.matchesPlayed+"\n" + 
-                                                "broj winova  " + apiData.wins+ "\n" +
-                                                "broj killova  " + apiData.kills);
-                counter++;
+                counter += chnl.Users.Count;
             }
+            if (counter < 1)
+                return true;
+            else 
+                return false;
         }
     }
 }

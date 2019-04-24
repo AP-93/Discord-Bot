@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DiscordBotCore.Fortnite.PlayerStats
+namespace DiscordBotCore.Fortnite.PlayerStats.FortniteApi
 {
     public class PlayerID
     {

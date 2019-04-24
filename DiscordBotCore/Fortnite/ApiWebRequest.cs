@@ -1,25 +1,24 @@
 ﻿using Newtonsoft.Json;
-using DiscordBotCore.Fortnite.PlayerStats;
 using System.Threading.Tasks;
-using DiscordBotCore.Fortnite;
 using DiscordBotCore.Storage.Database;
 using System.Linq;
-using DiscordBotCore.Storage;
+using DiscordBotCore.Fortnite.FortniteApi;
+using DiscordBotCore.HttpClientProviders;
+using DiscordBotCore.Fortnite.FortniteTrackerApi;
 
-namespace DiscordBotCore
+namespace DiscordBotCore.Fortnite
 {
-    public class ApiWebRequest
+    public class ApiWebRequest : IApiWebRequest
     {
         static IHttpClientProvider _httpProvider;
-        //private readonly IDataStorage _dataStorage;
 
         public ApiWebRequest(IHttpClientProvider httpProvider)
         {
             _httpProvider = httpProvider;
-           // _dataStorage = dataStorage;
         }
 
-        public static async Task<string> GetPlayerIdAsync(string path)
+        /*
+        public async Task<string> GetPlayerIdAsync(string path)
         {
          
             PlayerID playerId = null;
@@ -32,7 +31,7 @@ namespace DiscordBotCore
             return playerId.uid;
         }
 
-        public static async Task<string> GetPlayerName(string arg)
+        public  async Task<string> GetPlayerName(string arg)
         {
             //string id = await GetPlayerIdAsync(arg);
             PlayerData data = null;
@@ -44,36 +43,32 @@ namespace DiscordBotCore
             }
             return (data.EpicName);
         }
-
+        */
 
         //look for all time stats  change
-        public static async Task<Players> GetPlayerMatchesAsync(string arg)
+        public async Task<Players> GetPlayerMatchesAsync(string id)
         {
-          
-            PlayerData data = new PlayerData();
             Players players = new Players();
-            var response = await _httpProvider.GetAsync("https://fortnite-public-api.theapinetwork.com/prod09/users/public/br_stats_v2?user_id=" + arg);
+            var response = await _httpProvider.GetAsync("https://fortnite-user-api.theapinetwork.com/prod09/users/public/br_stats?user_id=" + id + "&platform=pc", "Authorization");
             if (response.IsSuccessStatusCode)
             {
-                data = JsonConvert.DeserializeObject<PlayerData>(
-                  await response.Content.ReadAsStringAsync());
+                var data = JsonConvert.DeserializeObject<UserStatsV1>(
+                   await response.Content.ReadAsStringAsync());
 
-                players.matchesPlayed = (int)(data.OverallData.DefaultModes.Matchesplayed + data.OverallData.LargeTeamModes.Matchesplayed + data.OverallData.LtmModes.Matchesplayed);
-                players.kills = (int)(data.OverallData.DefaultModes.Kills + data.OverallData.LargeTeamModes.Kills + data.OverallData.LtmModes.Kills);
-                players.wins = (int)(data.OverallData.DefaultModes.Placetop1 + data.OverallData.LargeTeamModes.Placetop1 + data.OverallData.LtmModes.Placetop1);
-                players.FortniteName = data.EpicName;
-
+                players.matchesPlayed = data.totals.matchesplayed;
+                players.kills = data.totals.kills;
+                players.wins = data.totals.wins;
+                players.FortniteName = data.username;
             }
             return players;
         }
 
-        public static async Task<Players> GetPlayerMatchesFortniteTrackerAsync(string arg)
+        public async Task<Players> GetPlayerMatchesFortniteTrackerAsync(string arg)
         {
-            //string id = await GetPlayerIdAsync(arg);
             FortniteTrackerData data = new FortniteTrackerData();
             Players players = new Players();
 
-            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + arg);
+            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + arg, "TRN-Api-Key");
             if (response.IsSuccessStatusCode)
             {
                 data = JsonConvert.DeserializeObject<FortniteTrackerData>(
@@ -89,39 +84,36 @@ namespace DiscordBotCore
             return players;
         }
 
-
-
         // lifetime solo stats
-        public static async Task<string> GetSoloStats(string arg)
+        public async Task<string> GetSoloStats(string arg)
         {
             FortniteTrackerData data = new FortniteTrackerData();
 
-            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + arg);
+            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + arg, "TRN-Api-Key");
             if (response.IsSuccessStatusCode)
             {
                 data = JsonConvert.DeserializeObject<FortniteTrackerData>(
                   await response.Content.ReadAsStringAsync());
-
             }
             var path = data.stats.p2;
-            return ("Matches: "+path.matches.value+"\n"+
-                    "Wins: "+ path.top1.value + "\n" +
-                    "Kills: "+ path.kills.value + "\n" +
+            return ("Matches: " + path.matches.value + "\n" +
+                    "Wins: " + path.top1.value + "\n" +
+                    "Kills: " + path.kills.value + "\n" +
                     "K/d: " + path.kd.value + "\n" +
-                    "WinRatio: "+ path.winRatio.value + "%"
+                    "WinRatio: " + path.winRatio.value + "%"
                 );
         }
+
         // lifetime duo stats
-        public static async Task<string> GetDuoStats(string arg)
+        public async Task<string> GetDuoStats(string arg)
         {
             FortniteTrackerData data = new FortniteTrackerData();
 
-            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + arg);
+            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + arg, "TRN-Api-Key");
             if (response.IsSuccessStatusCode)
             {
                 data = JsonConvert.DeserializeObject<FortniteTrackerData>(
                   await response.Content.ReadAsStringAsync());
-
             }
             var path = data.stats.p10;
             return ("Matches: " + path.matches.value + "\n" +

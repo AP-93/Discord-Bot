@@ -7,22 +7,11 @@ namespace DiscordBotCore.Storage.Implementations
 {
     public class JsonStorage : IDataStorage
     {
-        public AuthToken RestoreToken()
+        public string RestoreToken(string key)
         {
-
             var json = File.ReadAllText(GetCurrentDirectory() + @"\Config.json");
-            var array = JsonConvert.DeserializeObject<AuthToken>(json);
-            return array;
-
-        }
-
-        public void StoreObject(object obj, string key)
-        {
-            var file = $"{key}.json";
-            CreateDirectory(Path.GetDirectoryName(file));
-
-            var json = JsonConvert.SerializeObject(obj);
-            File.WriteAllText(file, json);
+            var array = (JObject)JsonConvert.DeserializeObject(json);
+            return array[key].Value<string>();
         }
     }
 }

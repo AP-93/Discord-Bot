@@ -1,16 +1,15 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotCore.Fortnite;
 using DiscordBotCore.Log;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Unity.Microsoft.DependencyInjection;
 
 namespace DiscordBotCore.Discord.Commands
 {
-     class CommandHandler : ICommandHandler
+    class CommandHandler : ICommandHandler
     {
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
@@ -22,7 +21,7 @@ namespace DiscordBotCore.Discord.Commands
         {
             _commands = commands;
             _client = client;
-            _logger = logger;  
+            _logger = logger;
         }
 
         public async Task InstallCommandsAsync()
@@ -31,13 +30,7 @@ namespace DiscordBotCore.Discord.Commands
             _client.MessageReceived += HandleCommandAsync;
 
             _services = new ServiceCollection()
-                .AddSingleton(_client)
-                .AddSingleton(_commands)
-                .AddSingleton<ILogger, Logger>()
-                .AddSingleton<HttpClient>()
-                .AddSingleton<IHttpClientProvider,HttpClientProvider>()
-                .AddSingleton<ApiWebRequest>()
-                .BuildServiceProvider();
+                .BuildServiceProvider(Unity.Container);
 
             // Here we discover all of the command modules in the entry 
             // assembly and load them. Starting from Discord.NET 2.0, a
@@ -50,8 +43,6 @@ namespace DiscordBotCore.Discord.Commands
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
                                             services: _services);
         }
-
-     
 
         private async Task HandleCommandAsync(SocketMessage messageParam)
         {

@@ -1,7 +1,7 @@
 ﻿using DiscordBotCore.Discord.Entities;
 using System.Threading.Tasks;
 
-namespace DiscordBotCore.Discord
+namespace DiscordBotCore.Discord.Connections
 {
     interface IConnection
     {

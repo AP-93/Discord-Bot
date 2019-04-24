@@ -1,17 +1,7 @@
 {
   "token": "",
 
-  "fotrniteTrackerApi": 
-  {
-    "key": "TRN-Api-Key",
-    "value": ""
-  },
+  "TRN-Api-Key": "",
 
-  "fortniteApi":
-    {
-      "key": "Authorization",
-      "value": ""
-    }
-  
-
+  "Authorization": ""
 }

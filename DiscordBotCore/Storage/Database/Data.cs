@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+
 namespace DiscordBotCore.Storage.Database
 {
     public static class Data
@@ -16,7 +14,6 @@ namespace DiscordBotCore.Storage.Database
                 plyrList = (from p in db.Players select p).ToList();
                 return plyrList;
             }
-
         }
 
         public static async Task SaveChanges(int _ID, int _matchesPlayed, string _FortniteName, int _kills,int _wins)
@@ -34,17 +31,17 @@ namespace DiscordBotCore.Storage.Database
                 else
                 {
                     Players current = db.Players.Where(x => x.ID == _ID).FirstOrDefault();
+
                     current.matchesPlayed = _matchesPlayed;
                     current.kills = _kills;
                     current.wins = _wins;
+
                     if (current.FortniteName != _FortniteName)
                         current.FortniteName = _FortniteName;
                     db.Players.Update(current);
                 }
                 await db.SaveChangesAsync();
-
             }
-
         }
     }
 }
