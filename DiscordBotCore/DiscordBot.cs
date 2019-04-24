@@ -2,6 +2,7 @@
 using DiscordBotCore.Discord.Commands;
 using DiscordBotCore.Discord.Entities;
 using DiscordBotCore.Storage;
+using DiscordBotCore.Storage.Implementations;
 using System.Threading.Tasks;
 
 namespace DiscordBotCore
@@ -21,9 +22,10 @@ namespace DiscordBotCore
 
         public async Task Run()
         {
+           
             await _connection.ConnectAsync(new BotConfig
             {
-                Token = _dataStorage.RestoreToken("token"),
+                Token = _dataStorage.RestoreToken().token,
             });
 
             await _commandHandler.InstallCommandsAsync();

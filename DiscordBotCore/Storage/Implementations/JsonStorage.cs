@@ -5,14 +5,15 @@ using static System.IO.Directory;
 
 namespace DiscordBotCore.Storage.Implementations
 {
-    class JsonStorage : IDataStorage
+    public class JsonStorage : IDataStorage
     {
-        public string RestoreToken (string jsonKey)
+        public AuthToken RestoreToken()
         {
 
-            var json = File.ReadAllText(GetCurrentDirectory()+@"\Config.json");
-            var array = (JObject)JsonConvert.DeserializeObject(json);
-            return array[jsonKey].ToString();
+            var json = File.ReadAllText(GetCurrentDirectory() + @"\Config.json");
+            var array = JsonConvert.DeserializeObject<AuthToken>(json);
+            return array;
+
         }
 
         public void StoreObject(object obj, string key)

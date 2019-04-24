@@ -5,7 +5,7 @@ namespace DiscordBotCore.Fortnite
 {
     public interface IHttpClientProvider
     {
-        Task<HttpResponseMessage> GetAsync(string requestUri);
+        Task<HttpResponseMessage> GetAsync(string requestUri);//,string key,string token);
         Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent content);
         Task<HttpResponseMessage> PutAsync(string requestUri, HttpContent content);
         Task<HttpResponseMessage> DeleteAsync(string requestUri);

@@ -17,7 +17,7 @@ namespace DiscordBotCore.Fortnite
 
             loopingTimer = new Timer()
             {
-                Interval = 30000,
+                Interval = 600000,
                 AutoReset = true,
                 Enabled = true
             };
@@ -33,15 +33,16 @@ namespace DiscordBotCore.Fortnite
             int cnter = 0;
             foreach (Players plyr in plyrList)
             {
-                
+
+                //await CheckDataChangesFortniteTrackerAsync(plyr, cnter);
                 await CheckDataChangesAsync(plyr, cnter);
-                await Task.Delay(5000);
+                await Task.Delay(10000);
             }
 
-            if (cnter == 0)
+            /*if (cnter == 0)
             {
                 await channel.SendMessageAsync("NIKO NEGINE FORTNAJT PROPADA!!!");
-            }
+            }*/
         }
 
         private static async Task CheckDataChangesAsync(Players plyrs, int counter)
@@ -50,16 +51,34 @@ namespace DiscordBotCore.Fortnite
 
             var apiData = await ApiWebRequest.GetPlayerMatchesAsync(plyrs.FortniteID);
 
-            Console.WriteLine(plyrs.FortniteName+"UPISANO::    "+plyrs.matchesPlayed + "IZVUCENO :    "+ apiData.matchesPlayed);
+            Console.WriteLine(plyrs.FortniteName+"UPISANO:: "+plyrs.matchesPlayed + "  IZVUCENO :    "+ apiData.matchesPlayed);
             if (plyrs.matchesPlayed != apiData.matchesPlayed)
-                {
+            {
 
-                     await   Storage.Database.Data.SaveChanges(plyrs.ID, apiData.matchesPlayed, apiData.FortniteName);
-                    Console.WriteLine("upisano  "+ plyrs.FortniteName );
-                     await channel.SendMessageAsync(apiData.FortniteName + " GINE!!!");
-                    counter++;
-                }
+                await channel.SendMessageAsync(apiData.FortniteName + " GINE!!! \n" +
+                                            "Matches: " + (apiData.matchesPlayed - plyrs.matchesPlayed) + "\n" +
+                                            "Wins: " + (apiData.wins - plyrs.wins) + "\n" +
+                                            "Kills: " + (apiData.kills - plyrs.kills) + "\n");
+                await Storage.Database.Data.SaveChanges(plyrs.ID, apiData.matchesPlayed, apiData.FortniteName, apiData.kills,apiData.wins);
+            }
 
+
+        }
+        private static async Task CheckDataChangesFortniteTrackerAsync(Players plyrs, int counter)
+        {
+
+            var apiData = await ApiWebRequest.GetPlayerMatchesFortniteTrackerAsync(await ApiWebRequest.GetPlayerName(plyrs.FortniteID));
+
+            if (plyrs.matchesPlayed != apiData.matchesPlayed)
+            {
+
+                await Storage.Database.Data.SaveChanges(plyrs.ID, apiData.matchesPlayed, apiData.FortniteName ,apiData.kills, apiData.wins);
+                await channel.SendMessageAsync(apiData.FortniteName + " GINE!!! \n" + 
+                                                "broj meceva:  "+apiData.matchesPlayed+"\n" + 
+                                                "broj winova  " + apiData.wins+ "\n" +
+                                                "broj killova  " + apiData.kills);
+                counter++;
+            }
         }
     }
 }

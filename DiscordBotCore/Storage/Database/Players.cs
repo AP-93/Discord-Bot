@@ -10,6 +10,8 @@ namespace DiscordBotCore.Storage.Database
         public string FortniteID { get; set; }
         public string FortniteName { get; set; }
         public int matchesPlayed { get; set; }
+        public int wins { get; set; }
+        public int kills { get; set; }
 
     }
 }

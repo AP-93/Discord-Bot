@@ -19,7 +19,7 @@ namespace DiscordBotCore.Storage.Database
 
         }
 
-        public static async Task SaveChanges(int _ID, int _matchesPlayed, string FortniteName)
+        public static async Task SaveChanges(int _ID, int _matchesPlayed, string _FortniteName, int _kills,int _wins)
         {
             using(var db = new SqliteDbContext())
             {
@@ -35,8 +35,10 @@ namespace DiscordBotCore.Storage.Database
                 {
                     Players current = db.Players.Where(x => x.ID == _ID).FirstOrDefault();
                     current.matchesPlayed = _matchesPlayed;
-                    if (current.FortniteName != FortniteName)
-                        current.FortniteName = FortniteName;
+                    current.kills = _kills;
+                    current.wins = _wins;
+                    if (current.FortniteName != _FortniteName)
+                        current.FortniteName = _FortniteName;
                     db.Players.Update(current);
                 }
                 await db.SaveChangesAsync();
