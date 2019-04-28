@@ -1,6 +1,9 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using DiscordBotCore.Storage.Database;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -21,8 +24,6 @@ namespace DiscordBotCore.Fortnite
 
         public Task StartTimer()
         {
-            channel = _client.GetGuild(565554856132345856).GetTextChannel(565554856132345858);
-
             loopingTimer = new Timer()
             {
                 Interval = 60000,
@@ -36,6 +37,8 @@ namespace DiscordBotCore.Fortnite
 
         public async void OnTimerTickedAsync(object sender, ElapsedEventArgs e)
         {
+            await CreateFortChannel(_client.Guilds.FirstOrDefault(), channel);
+
             if (CheckIfVoiceEmpty())
             {
                 List<Players> plyrList = new List<Players>();
@@ -53,19 +56,51 @@ namespace DiscordBotCore.Fortnite
         {
             var apiData = await _apiWebRequest.GetPlayerMatchesAsync(plyrs.FortniteID);
 
-            if (plyrs.matchesPlayed != apiData.matchesPlayed && apiData.matchesPlayed != 0)
+            Console.WriteLine(plyrs.FortniteName + "\n" + "UPISANO " + plyrs.matchesPlayed + "\n " + "DOBAVLJENO " + apiData.matchesPlayed);
+
+            if ((plyrs.matchesPlayed != apiData.matchesPlayed) && (apiData.matchesPlayed != 0))
             {
-                await channel.SendMessageAsync(apiData.FortniteName + " GINE!!! \n" +
-                                            "Matches: " + (apiData.matchesPlayed - plyrs.matchesPlayed) + "\n" +
-                                            "Wins: " + (apiData.wins - plyrs.wins) + "\n" +
-                                            "Kills: " + (apiData.kills - plyrs.kills) + "\n");
+                var embed = new EmbedBuilder();
+
+                embed.AddField(apiData.FortniteName + " GINE!!!",
+                               "Matches: " + (apiData.matchesPlayed - plyrs.matchesPlayed) + "\n" +
+                               "Wins: " + (apiData.wins - plyrs.wins) + "\n" +
+                               "Kills: " + (apiData.kills - plyrs.kills) + "\n")
+                    .WithColor(Color.Red)
+                    .WithCurrentTimestamp();
+                await channel.SendMessageAsync(embed: embed.Build());
+
                 await Storage.Database.Data.SaveChanges(plyrs.ID, apiData.matchesPlayed, apiData.FortniteName, apiData.kills, apiData.wins);
+            }
+        }
+
+
+        public async Task CheckDataChangesAsyncTracker(Players plyrs)
+        {
+            var apiData = await _apiWebRequest.GetPlayerMatchesFortniteTrackerAsync(plyrs.FortniteID);
+
+            Console.WriteLine(plyrs.FortniteName + "\n" + "UPISANO " + plyrs.matchesPlayed + "\n " + "DOBAVLJENO " + apiData.matches);
+
+            if ((plyrs.lastMatchId != apiData.id))
+            {
+                var embed = new EmbedBuilder();
+
+                embed.AddField(plyrs.FortniteName + " GINE!!!",
+                               "Matches: " + (apiData.matches) + "\n" +
+                               "Wins: " + (apiData.top1) + "\n" +
+                               "Kills: " + (apiData.kills) + "\n"+
+                               "Time: "+apiData.dateCollected + "\n")
+                    .WithColor(Color.Red)
+                    .WithCurrentTimestamp();
+                await channel.SendMessageAsync(embed: embed.Build());
+
+                await Storage.Database.Data.SaveMatchId(plyrs.ID,apiData.id);
             }
         }
 
         public bool CheckIfVoiceEmpty()
         {
-            var chnls = _client.GetGuild(565554856132345856).VoiceChannels;
+            var chnls = _client.Guilds.FirstOrDefault().VoiceChannels;
             int counter = 0;
 
             foreach (var chnl in chnls)
@@ -74,8 +109,20 @@ namespace DiscordBotCore.Fortnite
             }
             if (counter < 1)
                 return true;
-            else 
+            else
                 return false;
+        }
+
+        public async Task CreateFortChannel(IGuild guild, ITextChannel textChannel)
+        {
+            if (((await guild.GetChannelsAsync()).FirstOrDefault(x => x.Name == "kotogine")) == null)
+            {
+                 await guild.CreateTextChannelAsync("kotogine", x =>
+                {
+                    x.Topic = "Ko tajno gine bot ga razotkrije";  
+                });
+            }
+            channel = ((await guild.GetChannelsAsync()).FirstOrDefault(x => x.Name == "kotogine")) as SocketTextChannel;
         }
     }
 }

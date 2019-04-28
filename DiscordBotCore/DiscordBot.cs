@@ -25,7 +25,6 @@ namespace DiscordBotCore
             {
                 Token = _dataStorage.RestoreToken("token"),
             });
-
             await _commandHandler.InstallCommandsAsync();
             await Task.Delay(-1);
         }

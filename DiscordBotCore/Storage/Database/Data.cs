@@ -43,5 +43,20 @@ namespace DiscordBotCore.Storage.Database
                 await db.SaveChangesAsync();
             }
         }
+
+        public static async Task SaveMatchId(int _ID, int _matchID)
+        {
+            using (var db = new SqliteDbContext())
+            {
+               
+                    Players current = db.Players.Where(x => x.ID == _ID).FirstOrDefault();
+
+                    current.lastMatchId = _matchID;
+                    
+                    db.Players.Update(current);
+                
+                await db.SaveChangesAsync();
+            }
+        }
     }
 }

@@ -12,5 +12,6 @@ namespace DiscordBotCore.Storage.Database
         public int matchesPlayed { get; set; }
         public int wins { get; set; }
         public int kills { get; set; }
+        public int lastMatchId { get; set; }
     }
 }

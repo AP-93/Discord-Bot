@@ -5,45 +5,22 @@ using System.Linq;
 using DiscordBotCore.Fortnite.FortniteApi;
 using DiscordBotCore.HttpClientProviders;
 using DiscordBotCore.Fortnite.FortniteTrackerApi;
+using System.Collections.Generic;
 
 namespace DiscordBotCore.Fortnite
 {
     public class ApiWebRequest : IApiWebRequest
     {
         static IHttpClientProvider _httpProvider;
+        static FortniteTrackerData _data;
+     
 
-        public ApiWebRequest(IHttpClientProvider httpProvider)
+        public ApiWebRequest(IHttpClientProvider httpProvider, FortniteTrackerData data)
         {
             _httpProvider = httpProvider;
-        }
-
-        /*
-        public async Task<string> GetPlayerIdAsync(string path)
-        {
+            _data = data;
          
-            PlayerID playerId = null;
-            var response = await _httpProvider.GetAsync("https://fortnite-public-api.theapinetwork.com/prod09/users/id?username=" + path);
-            if (response.IsSuccessStatusCode)
-            {
-                playerId = JsonConvert.DeserializeObject<PlayerID>(
-                 await response.Content.ReadAsStringAsync());
-            }
-            return playerId.uid;
         }
-
-        public  async Task<string> GetPlayerName(string arg)
-        {
-            //string id = await GetPlayerIdAsync(arg);
-            PlayerData data = null;
-            var response = await _httpProvider.GetAsync("https://fortnite-public-api.theapinetwork.com/prod09/users/public/br_stats_v2?user_id=" + arg);
-            if (response.IsSuccessStatusCode)
-            {
-                data = JsonConvert.DeserializeObject<PlayerData>(
-                 await response.Content.ReadAsStringAsync());
-            }
-            return (data.EpicName);
-        }
-        */
 
         //look for all time stats  change
         public async Task<Players> GetPlayerMatchesAsync(string id)
@@ -63,65 +40,62 @@ namespace DiscordBotCore.Fortnite
             return players;
         }
 
-        public async Task<Players> GetPlayerMatchesFortniteTrackerAsync(string arg)
+        // lifetime  stats
+        public async Task<FortniteTrackerApi.Stats> GetStats(string id)
         {
-            FortniteTrackerData data = new FortniteTrackerData();
-            Players players = new Players();
-
-            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + arg, "TRN-Api-Key");
+            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + id, "TRN-Api-Key");
             if (response.IsSuccessStatusCode)
             {
-                data = JsonConvert.DeserializeObject<FortniteTrackerData>(
+                _data = JsonConvert.DeserializeObject<FortniteTrackerData>(
                   await response.Content.ReadAsStringAsync());
-
-
-                players.matchesPlayed = int.Parse(data.lifeTimeStats.FirstOrDefault(o => o.key == "Matches Played").value);
-                players.kills = int.Parse(data.lifeTimeStats.FirstOrDefault(o => o.key == "Kills").value);
-                players.wins = int.Parse(data.lifeTimeStats.FirstOrDefault(o => o.key == "Wins").value);
-                players.FortniteName = data.epicUserHandle;
-
             }
-            return players;
+            return _data.stats;
         }
 
-        // lifetime solo stats
-        public async Task<string> GetSoloStats(string arg)
+        public async Task<FortniteTrackerLastMatch> GetPlayerMatchesFortniteTrackerAsync(string id)
         {
-            FortniteTrackerData data = new FortniteTrackerData();
+            var _matchData = new List<FortniteTrackerLastMatch>();
 
-            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + arg, "TRN-Api-Key");
+
+            var response = await _httpProvider.GetAsync("https://api.fortnitetracker.com/v1/profile/account/"+ id +"/matches", "TRN-Api-Key");
             if (response.IsSuccessStatusCode)
             {
-                data = JsonConvert.DeserializeObject<FortniteTrackerData>(
+                
+                _matchData = JsonConvert.DeserializeObject<List<FortniteTrackerLastMatch>>(
                   await response.Content.ReadAsStringAsync());
+
             }
-            var path = data.stats.p2;
-            return ("Matches: " + path.matches.value + "\n" +
-                    "Wins: " + path.top1.value + "\n" +
-                    "Kills: " + path.kills.value + "\n" +
-                    "K/d: " + path.kd.value + "\n" +
-                    "WinRatio: " + path.winRatio.value + "%"
-                );
+           
+            return _matchData.FirstOrDefault();
         }
 
-        // lifetime duo stats
-        public async Task<string> GetDuoStats(string arg)
-        {
-            FortniteTrackerData data = new FortniteTrackerData();
+        /*
+               public async Task<string> GetPlayerIdAsync(string path)
+               {
 
-            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + arg, "TRN-Api-Key");
-            if (response.IsSuccessStatusCode)
-            {
-                data = JsonConvert.DeserializeObject<FortniteTrackerData>(
-                  await response.Content.ReadAsStringAsync());
-            }
-            var path = data.stats.p10;
-            return ("Matches: " + path.matches.value + "\n" +
-                    "Wins: " + path.top1.value + "\n" +
-                    "Kills: " + path.kills.value + "\n" +
-                    "K/d: " + path.kd.value + "\n" +
-                    "WinRatio: " + path.winRatio.value + "%"
-                );
-        }
+                   PlayerID playerId = null;
+                   var response = await _httpProvider.GetAsync("https://fortnite-public-api.theapinetwork.com/prod09/users/id?username=" + path);
+                   if (response.IsSuccessStatusCode)
+                   {
+                       playerId = JsonConvert.DeserializeObject<PlayerID>(
+                        await response.Content.ReadAsStringAsync());
+                   }
+                   return playerId.uid;
+               }
+
+               public  async Task<string> GetPlayerName(string arg)
+               {
+                   //string id = await GetPlayerIdAsync(arg);
+                   PlayerData data = null;
+                   var response = await _httpProvider.GetAsync("https://fortnite-public-api.theapinetwork.com/prod09/users/public/br_stats_v2?user_id=" + arg);
+                   if (response.IsSuccessStatusCode)
+                   {
+                       data = JsonConvert.DeserializeObject<PlayerData>(
+                        await response.Content.ReadAsStringAsync());
+                   }
+                   return (data.EpicName);
+               }
+               */
+
     }
 }

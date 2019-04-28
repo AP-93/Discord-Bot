@@ -1,4 +1,5 @@
-﻿using DiscordBotCore.Storage.Database;
+﻿using DiscordBotCore.Fortnite.FortniteTrackerApi;
+using DiscordBotCore.Storage.Database;
 using System.Threading.Tasks;
 
 namespace DiscordBotCore.Fortnite
@@ -11,10 +12,10 @@ namespace DiscordBotCore.Fortnite
         //look for all time stats change
         Task<Players> GetPlayerMatchesAsync(string arg);
 
-        Task<Players> GetPlayerMatchesFortniteTrackerAsync(string arg);
-        // lifetime solo stats
-        Task<string> GetSoloStats(string arg);
-        // lifetime duo stats
-        Task<string> GetDuoStats(string arg);
+        Task<FortniteTrackerLastMatch> GetPlayerMatchesFortniteTrackerAsync(string arg);
+       
+        // lifetime stats
+        Task<FortniteTrackerApi.Stats> GetStats(string arg);
+
     }
 }

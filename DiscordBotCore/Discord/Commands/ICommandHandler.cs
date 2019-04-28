@@ -4,6 +4,6 @@ namespace DiscordBotCore.Discord.Commands
 {
     public interface ICommandHandler
     {
-        Task InstallCommandsAsync(); 
+        Task InstallCommandsAsync();
     }
 }

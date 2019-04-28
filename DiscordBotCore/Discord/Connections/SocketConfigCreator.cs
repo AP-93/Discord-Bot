@@ -9,7 +9,7 @@ namespace DiscordBotCore.Discord.Connections
         {
             return new DiscordSocketConfig
             {
-                LogLevel = LogSeverity.Debug,
+                LogLevel = LogSeverity.Debug, 
             };
         }
 
