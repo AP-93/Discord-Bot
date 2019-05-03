@@ -8,6 +8,6 @@ namespace DiscordBotCore.Fortnite
     {
         Task StartTimer();
         void OnTimerTickedAsync(object sender, ElapsedEventArgs e);
-        Task CheckDataChangesAsync(Players plyrs);
+        Task CheckDataChangesAsyncTracker(Players plyrs);
     }
 }

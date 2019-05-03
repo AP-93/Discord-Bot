@@ -1,25 +1,21 @@
-﻿using DiscordBotCore.Storage;
+﻿using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace DiscordBotCore.HttpClientProviders
 {
     public class HttpClientProvider : IHttpClientProvider
     {
-        private readonly HttpClient _httpClient;
-        private static IDataStorage _datastorage;
+        private static HttpClient _httpClient;
 
-        public HttpClientProvider(HttpClient httpClient,IDataStorage datastorage)
+        public HttpClientProvider(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _datastorage= datastorage;
         }
 
-        public Task<HttpResponseMessage> GetAsync(string requestUri, string key)
+        public Task<HttpResponseMessage> GetAsync(string requestUri)
         {
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add(key, _datastorage.RestoreToken(key));
-   
             return _httpClient.GetAsync(requestUri);
         }
 
@@ -36,6 +32,32 @@ namespace DiscordBotCore.HttpClientProviders
         public Task<HttpResponseMessage> DeleteAsync(string requestUri)
         {
             return _httpClient.DeleteAsync(requestUri);
+        }
+
+        public HttpClient GetHttpClient()
+        {
+            return _httpClient;
+        }
+
+        public HttpRequestHeaders GetHttpClientHeader()
+        {
+            return  _httpClient.DefaultRequestHeaders;
+        }
+
+        public MediaTypeWithQualityHeaderValue GetNewMTVQHeaderValue(string value)
+        {
+            return new MediaTypeWithQualityHeaderValue(value);
+        }
+
+        public AuthenticationHeaderValue GetAuthenticationHeaderValue(string type, string clientLauncherToken)
+
+        {
+            return new AuthenticationHeaderValue(type, clientLauncherToken);
+        }
+
+        public FormUrlEncodedContent MakeRequestBody(List<KeyValuePair<string, string>> requestData)
+        {
+            return new FormUrlEncodedContent(requestData);
         }
     }
 }

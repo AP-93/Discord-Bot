@@ -338,6 +338,8 @@ namespace DiscordBotCore.Fortnite.FortniteTrackerApi
         public string epicUserHandle { get; set; }
         public Stats stats { get; set; }
         public IList<LifeTimeStat> lifeTimeStats { get; set; }
+
+        //public IEnumerable<IDictionary<string, string>> LifeTimeStat { get; set; }
         public IList<RecentMatch> recentMatches { get; set; }
     }
 }

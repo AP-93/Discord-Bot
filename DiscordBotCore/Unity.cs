@@ -8,6 +8,9 @@ using DiscordBotCore.Discord.Commands;
 using DiscordBotCore.Fortnite;
 using DiscordBotCore.Discord.Connections;
 using DiscordBotCore.HttpClientProviders;
+using DiscordBotCore.EpicGamesAPI;
+using System.Net.Http;
+using DiscordBotCore.Discord;
 
 namespace DiscordBotCore
 {
@@ -33,12 +36,15 @@ namespace DiscordBotCore
             _container.RegisterSingleton<ICommandHandler, CommandHandler>();
             _container.RegisterSingleton<ILogger,Logger>();
             _container.RegisterSingleton<IHttpClientProvider, HttpClientProvider>();
+            _container.RegisterSingleton<HttpClient>();
             _container.RegisterSingleton<IApiWebRequest,ApiWebRequest>();
             _container.RegisterSingleton<IPlayersOnlineInfo,PlayersOnlineInfo>();
             // _container.RegisterType<DiscordSocketConfig>(new InjectionFactory(i => SocketConfigCreator.GetDefault()));
             _container.RegisterFactory<DiscordSocketConfig>(i => SocketConfigCreator.GetDefault());
             _container.RegisterSingleton<DiscordSocketClient>(new InjectionConstructor(typeof(DiscordSocketConfig)));
             _container.RegisterSingleton<DiscordBot>();
+            _container.RegisterSingleton<ILogin,Login>();
+            _container.RegisterSingleton<IGuildOperations, GuildOperations>();
         }
 
         public static T Resolve<T>()

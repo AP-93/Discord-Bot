@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 namespace DiscordBotCore.Storage.Database
 {
     public static class Data
-    { 
-        public static List <Players> GetData()
+    {
+        public static List<Players> GetData()
         {
-            List <Players> plyrList = new List<Players>();
+            List<Players> plyrList = new List<Players>();
             using (var db = new SqliteDbContext())
             {
                 plyrList = (from p in db.Players select p).ToList();
@@ -16,11 +16,11 @@ namespace DiscordBotCore.Storage.Database
             }
         }
 
-        public static async Task SaveChanges(int _ID, int _matchesPlayed, string _FortniteName, int _kills,int _wins)
+        public static async Task SaveChanges(int _ID, int _matchesPlayed, string _FortniteName, int _kills, int _wins)
         {
-            using(var db = new SqliteDbContext())
+            using (var db = new SqliteDbContext())
             {
-                if(db.Players.Where(x => x.ID == _ID).Count() < 1)
+                if (db.Players.Where(x => x.ID == _ID).Count() < 1)
                 {
                     db.Players.Add(new Players
                     {
@@ -48,13 +48,22 @@ namespace DiscordBotCore.Storage.Database
         {
             using (var db = new SqliteDbContext())
             {
-               
-                    Players current = db.Players.Where(x => x.ID == _ID).FirstOrDefault();
+                Players current = db.Players.Where(x => x.ID == _ID).FirstOrDefault();
+                current.lastMatchId = _matchID;
+                db.Players.Update(current);
 
-                    current.lastMatchId = _matchID;
-                    
-                    db.Players.Update(current);
-                
+                await db.SaveChangesAsync();
+            }
+        }
+
+        public static async Task SaveName(int _ID, string name)
+        {
+            using (var db = new SqliteDbContext())
+            {
+                Players current = db.Players.Where(x => x.ID == _ID).FirstOrDefault();
+                current.FortniteName = name;
+                db.Players.Update(current);
+
                 await db.SaveChangesAsync();
             }
         }

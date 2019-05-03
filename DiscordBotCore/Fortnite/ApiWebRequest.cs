@@ -1,32 +1,82 @@
-﻿using Newtonsoft.Json;
-using System.Threading.Tasks;
-using DiscordBotCore.Storage.Database;
-using System.Linq;
-using DiscordBotCore.Fortnite.FortniteApi;
+﻿using DiscordBotCore.Storage;
 using DiscordBotCore.HttpClientProviders;
 using DiscordBotCore.Fortnite.FortniteTrackerApi;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DiscordBotCore.Fortnite
 {
     public class ApiWebRequest : IApiWebRequest
     {
-        static IHttpClientProvider _httpProvider;
-        static FortniteTrackerData _data;
-     
+        private static IHttpClientProvider _clientProvider;
+        private static IDataStorage _dataStorage;
+        private string TrnApiKey;
+        private string FortniteTrackerEndpoint;
 
-        public ApiWebRequest(IHttpClientProvider httpProvider, FortniteTrackerData data)
+        public ApiWebRequest(IHttpClientProvider clientProvider, IDataStorage dataStorage)
         {
-            _httpProvider = httpProvider;
-            _data = data;
-         
+            _clientProvider = clientProvider;
+            _dataStorage = dataStorage;
+
+            GetConfigData();
         }
 
-        //look for all time stats  change
+        // Fortnite tracker solo,duo and squad stats  fortnitetracker.com
+        public async Task<FortniteTrackerApi.Stats> GetStats(string id)
+        {
+            FortniteTrackerData data = new FortniteTrackerData();
+            var header = _clientProvider.GetHttpClientHeader();
+
+            header.Clear();
+            header.Add("TRN-Api-Key", TrnApiKey);
+
+            var response = await _clientProvider.GetAsync(FortniteTrackerEndpoint + id);
+            if (response.IsSuccessStatusCode)
+            {
+                data = JsonConvert.DeserializeObject<FortniteTrackerData>(
+                  await response.Content.ReadAsStringAsync());
+            }
+            return data.stats;
+        }
+
+        // Fortnite tracker Lifetime stats   fortnitetracker.com
+        public async Task<List<FortniteTrackerApi.LifeTimeStat>> GetLifetimeStats(string id)
+        {
+            FortniteTrackerData data = new FortniteTrackerData();
+            var header = _clientProvider.GetHttpClientHeader();
+
+            header.Clear();
+            header.Add("TRN-Api-Key", TrnApiKey);
+
+            var response = await _clientProvider.GetAsync(FortniteTrackerEndpoint + id);
+            if (response.IsSuccessStatusCode)
+            {
+                data = JsonConvert.DeserializeObject<FortniteTrackerData>(
+                  await response.Content.ReadAsStringAsync());
+            }
+            return data.lifeTimeStats as List<FortniteTrackerApi.LifeTimeStat>;
+        }
+
+        public void GetConfigData()
+        {
+            TrnApiKey = _dataStorage.RestoreToken("TRN-Api-Key");
+            FortniteTrackerEndpoint = _dataStorage.RestoreToken("trackerPlayerStats");
+        }
+
+        /*
+        //look for all time stats  change  fortniteapi
         public async Task<Players> GetPlayerMatchesAsync(string id)
         {
             Players players = new Players();
-            var response = await _httpProvider.GetAsync("https://fortnite-user-api.theapinetwork.com/prod09/users/public/br_stats?user_id=" + id + "&platform=pc", "Authorization");
+
+            var header = _clientProvider.GetHttpClientHeader();
+
+            header.Clear();
+            header.Add("Authorization", "key");
+
+
+            var response = await _clientProvider.GetAsync("https://fortnite-user-api.theapinetwork.com/prod09/users/public/br_stats?user_id=" + id + "&platform=pc");
             if (response.IsSuccessStatusCode)
             {
                 var data = JsonConvert.DeserializeObject<UserStatsV1>(
@@ -38,36 +88,23 @@ namespace DiscordBotCore.Fortnite
                 players.FortniteName = data.username;
             }
             return players;
-        }
+        }*/
 
-        // lifetime  stats
-        public async Task<FortniteTrackerApi.Stats> GetStats(string id)
+        /*
+    //matches fortnitetracker.com
+    public async Task<FortniteTrackerLastMatch> GetPlayerMatchesFortniteTrackerAsync(string id)
+    {
+        var _matchData = new List<FortniteTrackerLastMatch>();
+
+        var response = await _clientProvider.GetAsync("https://api.fortnitetracker.com/v1/profile/account/" + id + "/matches");
+        if (response.IsSuccessStatusCode)
         {
-            var response = await _httpProvider.GetAsync(" https://api.fortnitetracker.com/v1/profile/pc/" + id, "TRN-Api-Key");
-            if (response.IsSuccessStatusCode)
-            {
-                _data = JsonConvert.DeserializeObject<FortniteTrackerData>(
-                  await response.Content.ReadAsStringAsync());
-            }
-            return _data.stats;
+
+            _matchData = JsonConvert.DeserializeObject<List<FortniteTrackerLastMatch>>(
+              await response.Content.ReadAsStringAsync());
         }
-
-        public async Task<FortniteTrackerLastMatch> GetPlayerMatchesFortniteTrackerAsync(string id)
-        {
-            var _matchData = new List<FortniteTrackerLastMatch>();
-
-
-            var response = await _httpProvider.GetAsync("https://api.fortnitetracker.com/v1/profile/account/"+ id +"/matches", "TRN-Api-Key");
-            if (response.IsSuccessStatusCode)
-            {
-                
-                _matchData = JsonConvert.DeserializeObject<List<FortniteTrackerLastMatch>>(
-                  await response.Content.ReadAsStringAsync());
-
-            }
-           
-            return _matchData.FirstOrDefault();
-        }
+        return _matchData.FirstOrDefault();
+    }*/
 
         /*
                public async Task<string> GetPlayerIdAsync(string path)
@@ -96,6 +133,5 @@ namespace DiscordBotCore.Fortnite
                    return (data.EpicName);
                }
                */
-
     }
 }
